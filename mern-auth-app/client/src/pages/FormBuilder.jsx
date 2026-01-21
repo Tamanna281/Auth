@@ -1,3 +1,4 @@
+// mern-auth-app\client\src\pages\FormBuilder.jsx
 import { useEffect, useState } from "react";
 import { saveForm, getForms, updateForm, deleteForm } from "../services/formApi";
 import Sidebar from "../components/Sidebar";
@@ -208,10 +209,10 @@ const FormBuilder = () => {
         <Sidebar />
 
         <div style={{ flex: 1, padding: "20px" }}>
-          <button onClick={resetBuilder}>+ Create </button>
+          
 
           <input
-            placeholder="Form Name"
+            placeholder="Enter Form Name"
             value={formName}
             onChange={e => setFormName(e.target.value)}
           />
@@ -219,46 +220,77 @@ const FormBuilder = () => {
           <Canvas fields={fields} setFields={setFields} />
 
           <button onClick={handleSave}>
-            {editingFormId ? "Update Form" : "Save Form"}
+            {editingFormId ? "Update Form" : "Save"}
+          </button>
+          <button onClick={resetBuilder}> New </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/";
+            }}
+          >
+            Logout
           </button>
         </div>
-
+      
         <div style={{ width: "300px", padding: "15px" }}>
           <h3>Saved Forms</h3>
-          {savedForms.map(form => (
-            <div
-            key={form._id}
-            style={{
-              border: form._id === editingFormId ? "2px solid green" : "1px solid #555",
-              padding: "10px",
-              marginBottom: "10px",
-            }}
-            >
-            <div
-              onClick={() => loadForm(form)}
-              style={{ cursor: "pointer" }}
-            >
-              <strong>{form.name}</strong>
-              <div>{form.fields.length} fields</div>
-            </div>
+          {savedForms.map((form) => (
+  <div
+    key={form._id}
+    style={{
+      border:
+        form._id === editingFormId
+          ? "2px solid green"
+          : "1px solid #555",
+      padding: "10px",
+      marginBottom: "10px",
+    }}
+  >
+    {/* Click name to load into builder */}
+    <div
+      onClick={() => loadForm(form)}
+      style={{ cursor: "pointer", marginBottom: "8px" }}
+    >
+      <strong>{form.name}</strong>
+      <div>{form.fields.length} fields</div>
+    </div>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(form._id);
-              }}
-              style={{
-                marginTop: "5px",
-                background: "red",
-                color: "white",
-                width: "100%",
-              }}
-            >
-              Delete
-            </button>
-          </div>
+    {/* ACTION BUTTONS */}
+    <div style={{ display: "flex", gap: "8px" }}>
+      {/* VIEW */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          window.location.href = `/forms/${form._id}`;
+        }}
+        style={{
+          flex: 1,
+          background: "#333",
+          color: "white",
+        }}
+      >
+        View
+      </button>
 
-          ))}
+      {/* DELETE */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDelete(form._id);
+        }}
+        style={{
+          flex: 1,
+          background: "red",
+          color: "white",
+        }}
+      >
+        Delete
+      </button>
+    </div>
+  </div>
+))}
+
         </div>
       </div>
     </DndContext>

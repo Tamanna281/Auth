@@ -1,21 +1,31 @@
+// client/src/pages/register.jsx
 import { useState } from "react";
 import axios from "axios";
 
-const Register = ({ onRegister }) => {
+const Register = ({ onRegister, switchToLogin }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    await axios.post("http://localhost:5000/api/auth/register", {
-      name,
-      email,
-      password,
-    });
+    try {
+      await axios.post("http://localhost:5000/api/auth/register", {
+        name,
+        email,
+        password,
+      });
 
-    onRegister(); // switch back to login
+      // registration success → go back to login
+      onRegister();
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Registration failed"
+      );
+    }
   };
 
   return (
@@ -27,6 +37,7 @@ const Register = ({ onRegister }) => {
           type="text"
           placeholder="Name"
           required
+          value={name}
           onChange={(e) => setName(e.target.value)}
         />
 
@@ -34,6 +45,7 @@ const Register = ({ onRegister }) => {
           type="email"
           placeholder="Email"
           required
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -41,11 +53,35 @@ const Register = ({ onRegister }) => {
           type="password"
           placeholder="Password"
           required
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
+        {error && (
+          <p style={{ color: "red", marginBottom: "8px" }}>
+            {error}
+          </p>
+        )}
+
         <button type="submit">Register</button>
       </form>
+
+      {/* 🔁 THIS WAS MISSING */}
+      <p style={{ marginTop: "10px", textAlign: "center" }}>
+        Already have an account?{" "}
+        <button
+          type="button"
+          onClick={switchToLogin}
+          style={{
+            background: "none",
+            color: "#646cff",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Login
+        </button>
+      </p>
     </div>
   );
 };

@@ -1,55 +1,62 @@
-import { useState } from "react";
+// client/src/App.jsx
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
 import Login from "./pages/login";
 import Register from "./pages/register";
 import FormBuilder from "./pages/FormBuilder";
-
+import FormViewer from "./pages/FormViewer";
 
 function App() {
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem("token")
-  );
 
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-  };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token);
+    setAuthChecked(true);
+  }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsAuthenticated(false);
-  };
-
-  if (isAuthenticated) {
-    return (
-      <div style={{ textAlign: "center", marginTop: "100px" }}>
-        <FormBuilder />
-        <button onClick={handleLogout}>Logout</button>
-      </div>
-    );
+  if (!authChecked) {
+    return <p style={{ textAlign: "center" }}>Checking authentication...</p>;
   }
 
   return (
-    <>
-      {isLogin ? (
-        <Login onLogin={handleLoginSuccess} />
-      ) : (
-        <Register onRegister={() => setIsLogin(true)} />
-      )}
+    <BrowserRouter>
+      <Routes>
+        {/* Unauthenticated users */}
+        {!isAuthenticated && (
+          <Route
+            path="/"
+            element={
+              isLogin ? (
+                <Login
+                  onLogin={() => setIsAuthenticated(true)}
+                  switchToRegister={() => setIsLogin(false)}
+                />
+              ) : (
+                <Register
+                  onRegister={() => setIsLogin(true)}
+                  switchToLogin={() => setIsLogin(true)}
+                />
+              )
+            }
+          />
+        )}
 
-      <p style={{ textAlign: "center", marginTop: "10px" }}>
-        {isLogin ? (
+        {/* Authenticated users */}
+        {isAuthenticated && (
           <>
-            Don’t have an account?{" "}
-            <button onClick={() => setIsLogin(false)}>Create Account</button>
-          </>
-        ) : (
-          <>
-            Already have an account?{" "}
-            <button onClick={() => setIsLogin(true)}>Login</button>
+            <Route path="/" element={<FormBuilder />} />
+            <Route path="/forms/:id" element={<FormViewer />} />
           </>
         )}
-      </p>
-    </>
+
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
