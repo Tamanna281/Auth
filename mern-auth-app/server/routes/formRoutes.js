@@ -3,6 +3,16 @@ const express = require("express");
 const router = express.Router();
 const Form = require("../models/Form");
 
+const {
+  createSubmission,
+  getFormSubmissions,
+} = require("../controllers/formSubmissionController");
+
+const {
+  editSubmission,
+} = require("../controllers/submissionEditController");
+
+
 const authMiddleware = require("../middleware/authMiddleware");
 const {
   saveForm,
@@ -18,6 +28,29 @@ router.get("/", authMiddleware, getForms);
 
 // Update an existing form (protected)
 router.put("/:id", authMiddleware, updateForm);
+
+// SUBMIT FORM (employee)
+router.post(
+  "/:formId/submissions",
+  authMiddleware,
+  createSubmission
+);
+
+// GET FORM SUBMISSIONS (admin)
+router.get(
+  "/:formId/submissions",
+  authMiddleware,
+  getFormSubmissions
+);
+
+// EDIT SUBMISSION (save revision)
+router.put(
+  "/submissions/:submissionId",
+  authMiddleware,
+  editSubmission
+);
+
+
 
 // GET single form by ID (for Form Renderer)
 router.get("/:id", authMiddleware, async (req, res) => {

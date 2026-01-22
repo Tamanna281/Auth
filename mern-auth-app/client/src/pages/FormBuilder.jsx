@@ -258,19 +258,34 @@ const FormBuilder = () => {
 
     {/* ACTION BUTTONS */}
     <div style={{ display: "flex", gap: "8px" }}>
-      {/* VIEW */}
+      {/* Edit */}
       <button
         onClick={(e) => {
           e.stopPropagation();
-          window.location.href = `/forms/${form._id}`;
-        }}
-        style={{
-          flex: 1,
-          background: "#333",
-          color: "white",
+          window.location.href = `/forms/${form._id}/edit`;
         }}
       >
-        View
+        Edit
+      </button>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          window.location.href = `/forms/${form._id}/fill`;
+        }}
+      >
+        Fill
+      </button>
+
+
+      {/* Submissions */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          window.location.href = `/forms/${form._id}/submissions`;
+        }}
+      >
+        Submissions
       </button>
 
       {/* DELETE */}

@@ -5,7 +5,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import FormBuilder from "./pages/FormBuilder";
-import FormViewer from "./pages/FormViewer";
+import FormEditor from "./pages/FormEditor";
+import FormSubmissions from "./pages/FormSubmissions";
+import FormFill from "./pages/FormFill";
+import EditSubmission from "./pages/EditSubmission";
 
 function App() {
   const [authChecked, setAuthChecked] = useState(false);
@@ -49,11 +52,31 @@ function App() {
         {isAuthenticated && (
           <>
             <Route path="/" element={<FormBuilder />} />
-            <Route path="/forms/:id" element={<FormViewer />} />
+
+            {/* EDIT FORM SCHEMA */}
+            <Route path="/forms/:id/edit" element={<FormEditor />} />
+
+            {/* VIEW SUBMISSIONS */}
+            <Route
+              path="/forms/:id/submissions"
+              element={<FormSubmissions />}
+            />
+
+            <Route
+              path="/submissions/:submissionId/edit"
+              element={<EditSubmission />}
+            />
+
+            <Route
+              path="/forms/:id/fill"
+              element={<FormFill />}
+            />
+
+
           </>
         )}
 
-        {/* Catch-all */}
+        {/* Catch-all MUST be last */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

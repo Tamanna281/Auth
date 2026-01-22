@@ -1,9 +1,9 @@
-// client/src/pages/FormViewer.jsx
+// client/src/pages/FormEditor.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const FormViewer = () => {
+const FormEditor = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState(null);
@@ -105,4 +105,4 @@ const FormViewer = () => {
   );
 };
 
-export default FormViewer;
+export default FormEditor;
