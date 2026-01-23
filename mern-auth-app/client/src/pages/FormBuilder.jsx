@@ -2,19 +2,14 @@
 import { useEffect, useState } from "react";
 import { saveForm, getForms, updateForm, deleteForm } from "../services/formApi";
 import Sidebar from "../components/Sidebar";
+import "../styles/formBuilder.css";
 
-import {
-  DndContext,
-  closestCenter,
-  useDroppable,
-} from "@dnd-kit/core";
-
+import { DndContext, closestCenter, useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
   useSortable,
 } from "@dnd-kit/sortable";
-
 import { CSS } from "@dnd-kit/utilities";
 
 /* ---------- Sortable Field ---------- */
@@ -23,84 +18,89 @@ const SortableField = ({ field, setFields }) => {
     useSortable({ id: field.id });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    border: "1px solid #ccc",
-    padding: "10px",
-    marginBottom: "8px",
-    background: "#111",
-  };
+  transform: CSS.Transform.toString(transform),
+  transition,
+  opacity: transform ? 0.85 : 1,
+};
 
   return (
-    <div ref={setNodeRef} style={style}>
-      <div {...attributes} {...listeners} style={{ cursor: "grab", color: "#aaa" }}>
-        ⠿ Drag
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="field-card animate-in"
+    >
+      <div className="field-drag" {...attributes} {...listeners}>
+        ⠿
       </div>
 
-      <div><strong>Type:</strong> {field.type}</div>
+      <div className="field-body">
+        <span className="field-type">{field.type}</span>
 
-      <input
-        type="text"
-        value={field.label}
-        onChange={(e) =>
-          setFields(prev =>
-            prev.map(f =>
-              f.id === field.id ? { ...f, label: e.target.value } : f
-            )
-          )
-        }
-        style={{ width: "100%", marginTop: "5px" }}
-      />
-
-      <label>
         <input
-          type="checkbox"
-          checked={field.required}
+          value={field.label}
           onChange={(e) =>
-            setFields(prev =>
-              prev.map(f =>
-                f.id === field.id
-                  ? { ...f, required: e.target.checked }
-                  : f
+            setFields((prev) =>
+              prev.map((f) =>
+                f.id === field.id ? { ...f, label: e.target.value } : f
               )
             )
           }
-        />{" "}
-        Required
-      </label>
+        />
 
-      <button
-        onClick={() =>
-          setFields(prev => prev.filter(f => f.id !== field.id))
-        }
-        style={{ background: "red", color: "white", marginTop: "5px" }}
-      >
-        Delete
-      </button>
+        <div className="field-actions">
+          <label>
+            <input
+              type="checkbox"
+              checked={field.required}
+              onChange={(e) =>
+                setFields((prev) =>
+                  prev.map((f) =>
+                    f.id === field.id
+                      ? { ...f, required: e.target.checked }
+                      : f
+                  )
+                )
+              }
+            />
+            Required
+          </label>
+
+          <button
+            className="btn danger"
+            onClick={() =>
+              setFields((prev) => prev.filter((f) => f.id !== field.id))
+            }
+          >
+            Delete
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
 /* ---------- Canvas ---------- */
 const Canvas = ({ fields, setFields }) => {
-  const { setNodeRef } = useDroppable({ id: "canvas" });
+  const { setNodeRef, isOver } = useDroppable({ id: "canvas" });
 
   return (
     <div
       ref={setNodeRef}
-      style={{
-        minHeight: "400px",
-        border: "2px dashed #555",
-        padding: "15px",
-      }}
+      className={`canvas ${isOver ? "canvas-active" : ""}`}
     >
       <h3>Form Fields</h3>
 
+      {fields.length === 0 && (
+        <div className="canvas-placeholder">
+          Drag fields here
+        </div>
+      )}
+
       <SortableContext
-        items={fields.map(f => f.id)}
+        items={fields.map((f) => f.id)}
         strategy={verticalListSortingStrategy}
       >
-        {fields.map(field => (
+        {fields.map((field) => (
           <SortableField
             key={field.id}
             field={field}
@@ -131,17 +131,12 @@ const FormBuilder = () => {
   };
 
   const handleSave = async () => {
-    if (!formName || fields.length === 0) {
-      alert("Form name and at least one field are required");
-      return;
-    }
+    if (!formName || fields.length === 0) return;
 
     if (editingFormId) {
       await updateForm(editingFormId, { name: formName, fields });
-      alert("Form updated successfully");
     } else {
       await saveForm({ name: formName, fields });
-      alert("Form created successfully");
     }
 
     fetchForms();
@@ -160,23 +155,10 @@ const FormBuilder = () => {
   };
 
   const handleDelete = async (id) => {
-  const confirm = window.confirm("Are you sure you want to delete this form?");
-  if (!confirm) return;
-
-  await deleteForm(id);
-
-  setSavedForms((prev) => prev.filter((f) => f._id !== id));
-
-  // if deleting currently edited form
-  if (id === editingFormId) {
-    setFormName("");
-    setFields([]);
-    setEditingFormId(null);
-  }
-
-  fetchForms();
-};
-
+    if (!window.confirm("Delete this form?")) return;
+    await deleteForm(id);
+    fetchForms();
+  };
 
   return (
     <DndContext
@@ -184,128 +166,116 @@ const FormBuilder = () => {
       onDragEnd={({ active, over }) => {
         if (!over) return;
 
-        if (over.id === "canvas" && active.id.startsWith("template-")) {
+        /* CREATE from sidebar */
+        if (
+          active.id.startsWith("template-") &&
+          over.id === "canvas"
+        ) {
           const type = active.id.replace("template-", "");
-          setFields(prev => [
+
+          setFields((prev) => [
             ...prev,
-            { id: Date.now().toString(), type, label: `${type} field`, required: false }
+            {
+              id: crypto.randomUUID(),
+              type,
+              label: `${type} field`,
+              required: false,
+            },
           ]);
+
           return;
         }
 
+        /* REORDER */
         if (active.id !== over.id) {
-          setFields(prev => {
-            const oldIndex = prev.findIndex(f => f.id === active.id);
-            const newIndex = prev.findIndex(f => f.id === over.id);
-            const copy = [...prev];
-            const [moved] = copy.splice(oldIndex, 1);
-            copy.splice(newIndex, 0, moved);
-            return copy;
+          setFields((prev) => {
+            const oldIndex = prev.findIndex((f) => f.id === active.id);
+            const newIndex = prev.findIndex((f) => f.id === over.id);
+
+            if (oldIndex === -1 || newIndex === -1) return prev;
+
+            const updated = [...prev];
+            const [moved] = updated.splice(oldIndex, 1);
+            updated.splice(newIndex, 0, moved);
+            return updated;
           });
         }
       }}
     >
-      <div style={{ display: "flex" }}>
+      <div className="builder-layout">
         <Sidebar />
 
-        <div style={{ flex: 1, padding: "20px" }}>
-          
+        <div className="builder-main">
+          <div className="builder-panel">
+            <input
+              className="form-name-input"
+              placeholder="Form name"
+              value={formName}
+              onChange={(e) => setFormName(e.target.value)}
+            />
 
-          <input
-            placeholder="Enter Form Name"
-            value={formName}
-            onChange={e => setFormName(e.target.value)}
-          />
+            <Canvas fields={fields} setFields={setFields} />
 
-          <Canvas fields={fields} setFields={setFields} />
+            <div className="builder-actions">
+              <button className="btn primary" onClick={handleSave}>
+                {editingFormId ? "Update" : "Save"}
+              </button>
+              <button className="btn secondary" onClick={resetBuilder}>
+                New
+              </button>
+            </div>
+          </div>
 
-          <button onClick={handleSave}>
-            {editingFormId ? "Update Form" : "Save"}
-          </button>
-          <button onClick={resetBuilder}> New </button>
-          <button
-            onClick={() => {
-              localStorage.removeItem("token");
-              window.location.href = "/";
-            }}
-          >
-            Logout
-          </button>
-        </div>
-      
-        <div style={{ width: "300px", padding: "15px" }}>
-          <h3>Saved Forms</h3>
-          {savedForms.map((form) => (
-  <div
-    key={form._id}
-    style={{
-      border:
-        form._id === editingFormId
-          ? "2px solid green"
-          : "1px solid #555",
-      padding: "10px",
-      marginBottom: "10px",
-    }}
-  >
-    {/* Click name to load into builder */}
-    <div
-      onClick={() => loadForm(form)}
-      style={{ cursor: "pointer", marginBottom: "8px" }}
-    >
-      <strong>{form.name}</strong>
-      <div>{form.fields.length} fields</div>
-    </div>
+          <div className="forms-panel">
+            <h3>Saved Forms</h3>
 
-    {/* ACTION BUTTONS */}
-    <div style={{ display: "flex", gap: "8px" }}>
-      {/* Edit */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          window.location.href = `/forms/${form._id}/edit`;
-        }}
-      >
-        Edit
-      </button>
+            {savedForms.map((form) => (
+              <div
+                key={form._id}
+                className={`form-card ${
+                  form._id === editingFormId ? "active" : ""
+                }`}
+              >
+                <div className="form-info" onClick={() => loadForm(form)}>
+                  <h4>{form.name}</h4>
+                  <span>{form.fields.length} fields</span>
+                </div>
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          window.location.href = `/forms/${form._id}/fill`;
-        }}
-      >
-        Fill
-      </button>
-
-
-      {/* Submissions */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          window.location.href = `/forms/${form._id}/submissions`;
-        }}
-      >
-        Submissions
-      </button>
-
-      {/* DELETE */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          handleDelete(form._id);
-        }}
-        style={{
-          flex: 1,
-          background: "red",
-          color: "white",
-        }}
-      >
-        Delete
-      </button>
-    </div>
-  </div>
-))}
-
+                <div className="form-actions">
+                  <button
+                    className="btn secondary"
+                    onClick={() =>
+                      (window.location.href = `/forms/${form._id}/edit`)
+                    }
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn secondary"
+                    onClick={() =>
+                      (window.location.href = `/forms/${form._id}/fill`)
+                    }
+                  >
+                    Fill
+                  </button>
+                  <button
+                    className="btn primary"
+                    onClick={() =>
+                      (window.location.href = `/forms/${form._id}/submissions`)
+                    }
+                  >
+                    Submissions
+                  </button>
+                  <button
+                    className="btn danger"
+                    onClick={() => handleDelete(form._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </DndContext>

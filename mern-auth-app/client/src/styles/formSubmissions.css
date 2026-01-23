@@ -1,0 +1,146 @@
+.submissions-wrapper {
+  padding: 32px;
+  min-height: 100vh;
+  background: #020617;
+  width: 100vw;
+}
+
+.submissions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.submissions-header h2 {
+  margin-bottom: 4px;
+}
+
+.submissions-header p {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.submissions-state {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+}
+
+.submissions-state.error {
+  color: #f87171;
+}
+
+.submissions-empty {
+  margin-top: 80px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.submissions-empty h3 {
+  margin-bottom: 8px;
+  color: white;
+}
+
+.submissions-table-wrapper {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.submissions-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #0f172a;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.submissions-table th,
+.submissions-table td {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #1e293b;
+}
+
+.submissions-table th {
+  background: #020617;
+  color: #cbd5f5;
+  font-weight: 500;
+}
+
+.submissions-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.user-cell {
+  font-weight: 500;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 50;
+}
+
+.preview-panel {
+  width: 420px;
+  height: 100%;
+  background: #0f172a;
+  padding: 24px;
+  overflow-y: auto;
+  animation: slideIn 200ms ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.preview-header button {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.preview-user {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 20px;
+}
+
+.preview-field {
+  margin-bottom: 16px;
+}
+
+.preview-field span {
+  font-size: 13px;
+  color: #cbd5f5;
+}
+
+.preview-field p {
+  margin-top: 4px;
+  font-size: 14px;
+}

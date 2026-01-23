@@ -10,6 +10,7 @@ import FormSubmissions from "./pages/FormSubmissions";
 import FormFill from "./pages/FormFill";
 import EditSubmission from "./pages/EditSubmission";
 
+
 function App() {
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -78,6 +79,8 @@ function App() {
 
         {/* Catch-all MUST be last */}
         <Route path="*" element={<Navigate to="/" />} />
+        
+
       </Routes>
     </BrowserRouter>
   );

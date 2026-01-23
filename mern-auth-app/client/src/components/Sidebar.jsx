@@ -1,4 +1,7 @@
+// mern-auth-app\client\src\components\Sidebar.jsx
 import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import "../styles/sidebar.css";
 
 const FIELD_TEMPLATES = [
   { type: "text", label: "Text Field" },
@@ -11,16 +14,18 @@ const DraggableItem = ({ id, label }) => {
     useDraggable({ id });
 
   const style = {
-    padding: "10px",
-    marginBottom: "10px",
-    border: "1px solid #888",
-    background: isDragging ? "#333" : "#1e1e1e",
-    cursor: "grab",
+    transform: CSS.Transform.toString(transform),
     opacity: isDragging ? 0.6 : 1,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="sidebar-item"
+      {...listeners}
+      {...attributes}
+    >
       {label}
     </div>
   );
@@ -28,23 +33,33 @@ const DraggableItem = ({ id, label }) => {
 
 const Sidebar = () => {
   return (
-    <div
-      style={{
-        width: "250px",
-        padding: "15px",
-        borderRight: "2px solid #444",
-      }}
-    >
-      <h3>Form Fields</h3>
+    <aside className="sidebar">
+      {/* TOP */}
+      <div className="sidebar-content">
+        <h3 className="sidebar-title">Form Fields</h3>
 
-      {FIELD_TEMPLATES.map((field) => (
-        <DraggableItem
-          key={field.type}
-          id={`template-${field.type}`}
-          label={field.label}
-        />
-      ))}
-    </div>
+        {FIELD_TEMPLATES.map((field) => (
+          <DraggableItem
+            key={field.type}
+            id={`template-${field.type}`}
+            label={field.label}
+          />
+        ))}
+      </div>
+
+      {/* BOTTOM */}
+      <div className="sidebar-footer">
+        <button
+          className="sidebar-logout"
+          onClick={() => {
+            localStorage.removeItem("token");
+            window.location.href = "/";
+          }}
+        >
+          Logout
+        </button>
+      </div>
+    </aside>
   );
 };
 

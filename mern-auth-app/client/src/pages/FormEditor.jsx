@@ -1,11 +1,12 @@
-// client/src/pages/FormEditor.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import "../styles/formEdit.css";
 
 const FormEditor = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [form, setForm] = useState(null);
   const [error, setError] = useState("");
 
@@ -57,50 +58,84 @@ const FormEditor = () => {
     }
   };
 
-  if (error) return <p>{error}</p>;
-  if (!form) return <p>Loading...</p>;
+  if (error) {
+    return <div className="form-fill-state error">{error}</div>;
+  }
+
+  if (!form) {
+    return <div className="form-fill-state">Loading...</div>;
+  }
 
   return (
-    <div style={{ padding: "30px", maxWidth: "700px", margin: "0 auto" }}>
-      <h2>Edit Form</h2>
+    <div className="edit-form-page">
+      <div className="edit-form-card">
+        <h2 className="edit-form-title">Edit Form</h2>
+        <p className="edit-form-subtitle">
+          Update form structure and field settings
+        </p>
 
-      <input
-        value={form.name}
-        onChange={(e) =>
-          setForm({ ...form, name: e.target.value })
-        }
-        style={{ width: "100%", marginBottom: "20px" }}
-      />
-
-      {form.fields.map((field) => (
-        <div
-          key={field.id}
-          style={{ border: "1px solid #555", padding: "10px", marginBottom: "10px" }}
-        >
-          <div>Type: {field.type}</div>
-
+        {/* Form name */}
+        <div className="edit-field">
+          <label>Form Name</label>
           <input
-            value={field.label}
+            value={form.name}
             onChange={(e) =>
-              handleFieldChange(field.id, "label", e.target.value)
+              setForm({ ...form, name: e.target.value })
             }
-            style={{ width: "100%" }}
           />
+        </div>
 
-          <label>
+        {/* Fields */}
+        {form.fields.map((field) => (
+          <div key={field.id} className="edit-field">
+            <label>
+              {field.type.toUpperCase()} Field
+            </label>
+
             <input
-              type="checkbox"
-              checked={field.required}
+              value={field.label}
               onChange={(e) =>
-                handleFieldChange(field.id, "required", e.target.checked)
+                handleFieldChange(field.id, "label", e.target.value)
               }
             />
-            Required
-          </label>
-        </div>
-      ))}
 
-      <button onClick={handleSave}>Save Changes</button>
+            <div className="edit-required">
+              <input
+                type="checkbox"
+                checked={field.required}
+                onChange={(e) =>
+                  handleFieldChange(
+                    field.id,
+                    "required",
+                    e.target.checked
+                  )
+                }
+              />{" "}
+              Required
+            </div>
+          </div>
+        ))}
+
+        {/* Actions */}
+        <div className="form-actions">
+          <button
+            className="btn secondary"
+            type="button"
+            onClick={() => navigate(-1)}
+          >
+            Cancel
+          </button>
+
+          <button
+            className="btn primary"
+            type="button"
+            onClick={handleSave}
+          >
+            Save Changes
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 };

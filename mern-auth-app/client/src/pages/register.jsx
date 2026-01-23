@@ -1,6 +1,6 @@
-// client/src/pages/register.jsx
 import { useState } from "react";
 import axios from "axios";
+import "../styles/auth.css";
 
 const Register = ({ onRegister, switchToLogin }) => {
   const [name, setName] = useState("");
@@ -29,59 +29,48 @@ const Register = ({ onRegister, switchToLogin }) => {
   };
 
   return (
-    <div className="auth-container">
-      <h2>Create Account</h2>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h2 className="auth-title">Create account</h2>
+        <p className="auth-subtitle">Start building forms</p>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Name"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Full name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
 
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <input
+            type="email"
+            placeholder="Email address"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        {error && (
-          <p style={{ color: "red", marginBottom: "8px" }}>
-            {error}
-          </p>
-        )}
+          {error && <div className="auth-error">{error}</div>}
 
-        <button type="submit">Register</button>
-      </form>
+          <button type="submit" className="btn primary full">
+            Create Account
+          </button>
+        </form>
 
-      {/* 🔁 THIS WAS MISSING */}
-      <p style={{ marginTop: "10px", textAlign: "center" }}>
-        Already have an account?{" "}
-        <button
-          type="button"
-          onClick={switchToLogin}
-          style={{
-            background: "none",
-            color: "#646cff",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Login
-        </button>
-      </p>
+        <p className="auth-footer">
+          Already have an account?
+          <span onClick={switchToLogin}> Login</span>
+        </p>
+      </div>
     </div>
   );
 };

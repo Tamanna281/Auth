@@ -1,6 +1,6 @@
-// client/src/pages/login.jsx
 import { useState } from "react";
 import axios from "axios";
+import "../styles/auth.css";
 
 const Login = ({ onLogin, switchToRegister }) => {
   const [email, setEmail] = useState("");
@@ -25,46 +25,40 @@ const Login = ({ onLogin, switchToRegister }) => {
   };
 
   return (
-    <div className="auth-container">
-      <h2>Login</h2>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h2 className="auth-title">Welcome back</h2>
+        <p className="auth-subtitle">Sign in to your account</p>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Email address"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        {error && (
-          <p style={{ color: "red", marginBottom: "8px" }}>
-            {error}
-          </p>
-        )}
+          {error && <div className="auth-error">{error}</div>}
 
-        <button type="submit">Login</button>
-      </form>
+          <button type="submit" className="btn primary full">
+            Login
+          </button>
+        </form>
 
-      {/* 🔑 THIS WAS MISSING */}
-      <p style={{ marginTop: "10px", textAlign: "center" }}>
-        Don’t have an account?{" "}
-        <button
-          type="button"
-          onClick={switchToRegister}
-          style={{ background: "none", color: "#646cff", border: "none", cursor: "pointer" }}
-        >
-          Create Account
-        </button>
-      </p>
+        <p className="auth-footer">
+          Don’t have an account?
+          <span onClick={switchToRegister}> Create Account</span>
+        </p>
+      </div>
     </div>
   );
 };
