@@ -1,4 +1,5 @@
-// mern-auth-app\client\src\pages\FormBuilder.jsx
+// mern-auth-app/client/src/pages/FormBuilder.jsx
+
 import { useEffect, useState } from "react";
 import { saveForm, getForms, updateForm, deleteForm } from "../services/formApi";
 import Sidebar from "../components/Sidebar";
@@ -18,17 +19,13 @@ const SortableField = ({ field, setFields }) => {
     useSortable({ id: field.id });
 
   const style = {
-  transform: CSS.Transform.toString(transform),
-  transition,
-  opacity: transform ? 0.85 : 1,
-};
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: transform ? 0.85 : 1,
+  };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="field-card animate-in"
-    >
+    <div ref={setNodeRef} style={style} className="field-card animate-in">
       <div className="field-drag" {...attributes} {...listeners}>
         ⠿
       </div>
@@ -84,16 +81,11 @@ const Canvas = ({ fields, setFields }) => {
   const { setNodeRef, isOver } = useDroppable({ id: "canvas" });
 
   return (
-    <div
-      ref={setNodeRef}
-      className={`canvas ${isOver ? "canvas-active" : ""}`}
-    >
+    <div ref={setNodeRef} className={`canvas ${isOver ? "canvas-active" : ""}`}>
       <h3>Form Fields</h3>
 
       {fields.length === 0 && (
-        <div className="canvas-placeholder">
-          Drag fields here
-        </div>
+        <div className="canvas-placeholder">Drag fields here</div>
       )}
 
       <SortableContext
@@ -118,6 +110,9 @@ const FormBuilder = () => {
   const [fields, setFields] = useState([]);
   const [savedForms, setSavedForms] = useState([]);
   const [editingFormId, setEditingFormId] = useState(null);
+
+  // FIX: preview state added
+  const [previewForm, setPreviewForm] = useState(null);
 
   useEffect(() => {
     fetchForms();
@@ -166,7 +161,7 @@ const FormBuilder = () => {
       onDragEnd={({ active, over }) => {
         if (!over) return;
 
-        /* CREATE from sidebar */
+        // CREATE from sidebar
         if (
           active.id.startsWith("template-") &&
           over.id === "canvas"
@@ -182,16 +177,14 @@ const FormBuilder = () => {
               required: false,
             },
           ]);
-
           return;
         }
 
-        /* REORDER */
+        // REORDER
         if (active.id !== over.id) {
           setFields((prev) => {
             const oldIndex = prev.findIndex((f) => f.id === active.id);
             const newIndex = prev.findIndex((f) => f.id === over.id);
-
             if (oldIndex === -1 || newIndex === -1) return prev;
 
             const updated = [...prev];
@@ -220,8 +213,22 @@ const FormBuilder = () => {
               <button className="btn primary" onClick={handleSave}>
                 {editingFormId ? "Update" : "Save"}
               </button>
+
               <button className="btn secondary" onClick={resetBuilder}>
                 New
+              </button>
+
+              {/* FIX: Preview trigger */}
+              <button
+                className="btn secondary"
+                onClick={() =>
+                  setPreviewForm({
+                    name: formName,
+                    fields: fields,
+                  })
+                }
+              >
+                Preview
               </button>
             </div>
           </div>
@@ -277,6 +284,41 @@ const FormBuilder = () => {
             ))}
           </div>
         </div>
+
+        {/* ---------- PREVIEW PANEL ---------- */}
+        {previewForm && (
+          <div
+            className="preview-overlay"
+            onClick={() => setPreviewForm(null)}
+          >
+            <div
+              className="preview-panel"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="preview-header">
+                <h3>Form Preview</h3>
+                <button onClick={() => setPreviewForm(null)}>✕</button>
+              </div>
+
+              <p className="preview-user">
+                Form name: <strong>{previewForm.name}</strong>
+              </p>
+
+              <div className="preview-fields">
+                {previewForm.fields.map((field) => (
+                  <div key={field.id} className="preview-field">
+                    <span>{field.label}</span>
+                    <p className="preview-placeholder">
+                      {field.type === "email" && "example@email.com"}
+                      {field.type === "text" && "Sample text"}
+                      {field.type === "textarea" && "Sample long text"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </DndContext>
   );

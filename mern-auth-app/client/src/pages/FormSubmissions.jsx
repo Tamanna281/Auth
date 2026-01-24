@@ -79,7 +79,7 @@ const FormSubmissions = () => {
                 {form.fields.map((f) => (
                   <th key={f.id}>{f.label}</th>
                 ))}
-                <th>Edited</th>
+                
                 <th>Action</th>
               </tr>
             </thead>
@@ -101,10 +101,10 @@ const FormSubmissions = () => {
                     </td>
                   ))}
 
-                  <td>{sub.isEdited ? "Yes" : "No"}</td>
+                
 
                   <td>
-                    <button
+                    {/* <button
                       className="btn small"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -112,7 +112,15 @@ const FormSubmissions = () => {
                       }}
                     >
                       Edit
-                    </button>
+                    </button> */}
+                    <button
+                    className="btn secondary"
+                    onClick={() =>
+                      (window.location.href = `/forms/${form._id}/fill`)
+                    }
+                  >
+                    Fill
+                  </button>
                   </td>
                 </tr>
               ))}

@@ -23,10 +23,11 @@
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-
   display: grid;
-  grid-template-columns: 260px 1fr 320px;
-  gap: 28px;
+  gap: 24px;
+  /* grid-template-columns: minmax(520px, 1.6fr) minmax(320px, 1fr); */
+  grid-template-columns: 2.2fr 1fr;
+
 }
 
 /* 
@@ -92,10 +93,12 @@
  */
 
 .builder-panel {
-  padding: 26px;
   display: flex;
-  height: 100%;
   flex-direction: column;
+  height: calc(100vh - 40px);
+  overflow: hidden;
+  max-width: none;
+  width: 100%;
 }
 
 .form-name-input {
@@ -127,7 +130,7 @@
   width: 100%;
   flex: 1;
   overflow-y: auto; 
-
+  padding-bottom: 16px;
   border-radius: 16px;
   border: 2px dashed rgba(148, 163, 184, 0.25);
   box-sizing: border-box;
@@ -137,6 +140,19 @@
   color: #94a3b8;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
+
+.builder-actions {
+  position: sticky;
+  bottom: 0;
+  background: rgba(10, 15, 25, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 12px;
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 10;
+}
+
 
 /* Active drop zone */
 .canvas-active {
@@ -369,4 +385,3 @@
   background: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
 }
-
