@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../styles/formSubmissions.css";
 
 const FormSubmissions = () => {
   const { id: formId } = useParams();
@@ -40,47 +39,67 @@ const FormSubmissions = () => {
     fetchData();
   }, [formId]);
 
-  if (loading)
-    return <div className="submissions-state">Loading submissions…</div>;
+  /*  STATES  */
 
-  if (error)
+  if (loading) {
+    return <p className="text-slate-400">Loading submissions…</p>;
+  }
+
+  if (error) {
     return (
-      <div className="submissions-state error">
+      <div className="rounded-xl border border-red-500/30 bg-slate-900 p-4 text-red-400">
         {error}
       </div>
     );
+  }
 
   if (!form) return null;
 
+  /*  UI  */
+
   return (
-    <div className="submissions-wrapper">
-      <div className="submissions-header">
+    <div className="mx-auto max-w-7xl px-6 py-10">
+      {/* Header */}
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h2>{form.name}</h2>
-          <p>All submitted responses</p>
+          <h2 className="text-2xl font-semibold text-white">
+            {form.name}
+          </h2>
+          <p className="text-sm text-slate-400">
+            All submitted responses
+          </p>
         </div>
 
-        <button className="btn secondary" onClick={() => navigate("/")}>
+        <button
+          onClick={() => navigate(-1)}
+          className="rounded-xl bg-slate-800 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700"
+        >
           Back
         </button>
       </div>
 
+      {/* Empty state */}
       {submissions.length === 0 ? (
-        <div className="submissions-empty">
-          <h3>No submissions yet</h3>
-          <p>Responses will appear here once submitted.</p>
+        <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-12 text-center">
+          <h3 className="text-lg font-medium text-white">
+            No submissions yet
+          </h3>
+          <p className="mt-1 text-sm text-slate-400">
+            Responses will appear here once submitted.
+          </p>
         </div>
       ) : (
-        <div className="submissions-table-wrapper">
-          <table className="submissions-table">
-            <thead>
+        <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900">
+          <table className="min-w-full text-sm text-slate-300">
+            <thead className="bg-slate-950 text-xs uppercase tracking-wide text-slate-400">
               <tr>
-                <th>User</th>
+                <th className="px-4 py-3 text-left">User</th>
                 {form.fields.map((f) => (
-                  <th key={f.id}>{f.label}</th>
+                  <th key={f.id} className="px-4 py-3 text-left">
+                    {f.label}
+                  </th>
                 ))}
-                
-                <th>Action</th>
+                <th className="px-4 py-3 text-right">Action</th>
               </tr>
             </thead>
 
@@ -88,39 +107,29 @@ const FormSubmissions = () => {
               {submissions.map((sub) => (
                 <tr
                   key={sub._id}
-                  className="clickable-row"
                   onClick={() => setSelected(sub)}
+                  className="cursor-pointer border-t border-slate-800 hover:bg-slate-800/50 transition"
                 >
-                  <td className="user-cell">
+                  <td className="px-4 py-3 font-medium text-white">
                     {sub.submittedBy?.name || "Unknown"}
                   </td>
 
                   {form.fields.map((f) => (
-                    <td key={f.id}>
+                    <td key={f.id} className="px-4 py-3">
                       {sub.values?.[f.id] || "—"}
                     </td>
                   ))}
 
-                
-
-                  <td>
-                    {/* <button
-                      className="btn small"
+                  <td className="px-4 py-3 text-right">
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/forms/${formId}/edit`);
+                        window.location.href = `/forms/${form._id}/fill`;
                       }}
+                      className="rounded-lg bg-slate-800 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700"
                     >
-                      Edit
-                    </button> */}
-                    <button
-                    className="btn secondary"
-                    onClick={() =>
-                      (window.location.href = `/forms/${form._id}/fill`)
-                    }
-                  >
-                    Fill
-                  </button>
+                      Fill
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -129,29 +138,48 @@ const FormSubmissions = () => {
         </div>
       )}
 
-      {/* PREVIEW PANEL */}
+      {/*  PREVIEW PANEL  */}
       {selected && (
-        <div className="preview-overlay" onClick={() => setSelected(null)}>
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+          onClick={() => setSelected(null)}
+        >
           <div
-            className="preview-panel"
+            className="absolute right-0 top-0 h-full w-full max-w-md bg-slate-950 border-l border-slate-800 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="preview-header">
-              <h3>Submission Preview</h3>
-              <button onClick={() => setSelected(null)}>✕</button>
+            <div className="flex items-center justify-between border-b border-slate-800 p-4">
+              <h3 className="text-lg font-semibold text-white">
+                Submission Preview
+              </h3>
+              <button
+                onClick={() => setSelected(null)}
+                className="text-slate-400 hover:text-white"
+              >
+                ✕
+              </button>
             </div>
 
-            <p className="preview-user">
-              {selected.submittedBy?.name || "Unknown user"}
-            </p>
+            <div className="p-4">
+              <p className="mb-4 text-sm text-slate-400">
+                {selected.submittedBy?.name || "Unknown user"}
+              </p>
 
-            <div className="preview-fields">
-              {form.fields.map((field) => (
-                <div key={field.id} className="preview-field">
-                  <span>{field.label}</span>
-                  <p>{selected.values?.[field.id] || "—"}</p>
-                </div>
-              ))}
+              <div className="space-y-4">
+                {form.fields.map((field) => (
+                  <div
+                    key={field.id}
+                    className="rounded-lg border border-slate-800 bg-slate-900 p-3"
+                  >
+                    <div className="text-xs uppercase text-slate-400 mb-1">
+                      {field.label}
+                    </div>
+                    <div className="text-sm text-white">
+                      {selected.values?.[field.id] || "—"}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

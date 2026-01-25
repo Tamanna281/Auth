@@ -16,7 +16,7 @@ const EditSubmission = () => {
       try {
         const token = localStorage.getItem("token");
 
-        // 1️⃣ Get submission
+        // Get submission
         const subRes = await axios.get(
           `http://localhost:5000/api/submissions/${submissionId}`,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -25,7 +25,7 @@ const EditSubmission = () => {
         setSubmission(subRes.data);
         setValues(subRes.data.values);
 
-        // 2️⃣ Get form schema
+        // Get form schema
         const formRes = await axios.get(
           `http://localhost:5000/api/forms/${subRes.data.formId}`,
           { headers: { Authorization: `Bearer ${token}` } }

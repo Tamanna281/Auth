@@ -1,5 +1,3 @@
-// client/src/App.jsx
-import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/login";
@@ -10,77 +8,68 @@ import FormSubmissions from "./pages/FormSubmissions";
 import FormFill from "./pages/FormFill";
 import EditSubmission from "./pages/EditSubmission";
 
+// Simple auth guard
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/login" />;
+};
 
 function App() {
-  const [authChecked, setAuthChecked] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-    setAuthChecked(true);
-  }, []);
-
-  if (!authChecked) {
-    return <p style={{ textAlign: "center" }}>Checking authentication...</p>;
-  }
-
   return (
     <BrowserRouter>
       <Routes>
-        {/* Unauthenticated users */}
-        {!isAuthenticated && (
-          <Route
-            path="/"
-            element={
-              isLogin ? (
-                <Login
-                  onLogin={() => setIsAuthenticated(true)}
-                  switchToRegister={() => setIsLogin(false)}
-                />
-              ) : (
-                <Register
-                  onRegister={() => setIsLogin(true)}
-                  switchToLogin={() => setIsLogin(true)}
-                />
-              )
-            }
-          />
-        )}
+        {/* PUBLIC */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-        {/* Authenticated users */}
-        {isAuthenticated && (
-          <>
-            <Route path="/" element={<FormBuilder />} />
+        {/* PROTECTED */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <FormBuilder />
+            </PrivateRoute>
+          }
+        />
 
-            {/* EDIT FORM SCHEMA */}
-            <Route path="/forms/:id/edit" element={<FormEditor />} />
+        <Route
+          path="/forms/:id/edit"
+          element={
+            <PrivateRoute>
+              <FormEditor />
+            </PrivateRoute>
+          }
+        />
 
-            {/* VIEW SUBMISSIONS */}
-            <Route
-              path="/forms/:id/submissions"
-              element={<FormSubmissions />}
-            />
+        <Route
+          path="/forms/:id/submissions"
+          element={
+            <PrivateRoute>
+              <FormSubmissions />
+            </PrivateRoute>
+          }
+        />
 
-            <Route
-              path="/submissions/:submissionId/edit"
-              element={<EditSubmission />}
-            />
+        <Route
+          path="/submissions/:submissionId/edit"
+          element={
+            <PrivateRoute>
+              <EditSubmission />
+            </PrivateRoute>
+          }
+        />
 
-            <Route
-              path="/forms/:id/fill"
-              element={<FormFill />}
-            />
+        <Route
+          path="/forms/:id/fill"
+          element={
+            <PrivateRoute>
+              <FormFill />
+            </PrivateRoute>
+          }
+        />
 
-
-          </>
-        )}
-
-        {/* Catch-all MUST be last */}
+        {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" />} />
-        
-
       </Routes>
     </BrowserRouter>
   );

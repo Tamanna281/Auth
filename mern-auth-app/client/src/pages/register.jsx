@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../styles/auth.css";
 
-const Register = ({ onRegister, switchToLogin }) => {
+export default function Register() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,28 +21,32 @@ const Register = ({ onRegister, switchToLogin }) => {
         password,
       });
 
-      // registration success → go back to login
-      onRegister();
+      // REAL navigation, not fake callbacks
+      navigate("/login");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Registration failed"
-      );
+      console.error("REGISTER ERROR:", err.response?.data);
+      setError(err.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <h2 className="auth-title">Create account</h2>
-        <p className="auth-subtitle">Start building forms</p>
+    <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="w-full max-w-sm rounded-xl border border-slate-800 bg-slate-900 p-6">
+        <h2 className="text-xl font-semibold text-white mb-1">
+          Create account
+        </h2>
+        <p className="text-sm text-slate-400 mb-6">
+          Start building forms
+        </p>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             placeholder="Full name"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
+            className="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <input
@@ -49,6 +55,7 @@ const Register = ({ onRegister, switchToLogin }) => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <input
@@ -57,22 +64,34 @@ const Register = ({ onRegister, switchToLogin }) => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          {error && <div className="auth-error">{error}</div>}
+          {error && (
+            <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+              {error}
+            </div>
+          )}
 
-          <button type="submit" className="btn primary full">
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-blue-600 py-2 text-sm font-medium text-white hover:bg-blue-500 transition"
+          >
             Create Account
           </button>
         </form>
 
-        <p className="auth-footer">
-          Already have an account?
-          <span onClick={switchToLogin}> Login</span>
+        <p className="mt-4 text-sm text-slate-400 text-center">
+          Already have an account?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            className="text-blue-400 cursor-pointer hover:underline"
+          >
+            Login
+          </span>
         </p>
+
       </div>
     </div>
   );
-};
-
-export default Register;
+}

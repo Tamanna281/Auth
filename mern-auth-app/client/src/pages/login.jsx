@@ -1,8 +1,10 @@
 import { useState } from "react";
-import axios from "axios";
-import "../styles/auth.css";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/authApi";
 
-const Login = ({ onLogin, switchToRegister }) => {
+export default function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,55 +14,62 @@ const Login = ({ onLogin, switchToRegister }) => {
     setError("");
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        { email, password }
-      );
-
+      const res = await loginUser({ email, password });
       localStorage.setItem("token", res.data.token);
-      onLogin();
+      navigate("/builder");
     } catch (err) {
-      setError("Invalid email or password");
+      console.error("LOGIN ERROR:", err.response?.data);
+      setError(err.response?.data?.message || "Invalid email or password");
     }
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <h2 className="auth-title">Welcome back</h2>
-        <p className="auth-subtitle">Sign in to your account</p>
+    <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="w-full max-w-sm rounded-xl border border-slate-800 bg-slate-900 p-6">
+        <h2 className="text-xl font-semibold text-white mb-6">Login</h2>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
-            placeholder="Email address"
-            required
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 text-white"
           />
 
           <input
             type="password"
             placeholder="Password"
-            required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 text-white"
           />
 
-          {error && <div className="auth-error">{error}</div>}
+          {error && (
+            <div className="text-sm text-red-400">{error}</div>
+          )}
 
-          <button type="submit" className="btn primary full">
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-blue-600 py-2 text-white"
+          >
             Login
           </button>
         </form>
 
-        <p className="auth-footer">
-          Don’t have an account?
-          <span onClick={switchToRegister}> Create Account</span>
+        <p className="mt-4 text-sm text-slate-400 text-center">
+          Don’t have an account?{" "}
+          <span
+            onClick={() => navigate("/register")}
+            className="text-blue-400 cursor-pointer hover:underline"
+          >
+            Create one
+          </span>
         </p>
+
       </div>
     </div>
   );
-};
-
-export default Login;
+}
